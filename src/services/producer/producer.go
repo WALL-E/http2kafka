@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"services"
-    "time"
-    "strconv"
+	"strconv"
+	"time"
 
 	"github.com/Shopify/sarama"
 )
@@ -55,15 +55,15 @@ func produce(topic string, key string, content string) error {
 		fmt.Println(msg)
 		return err
 	}
-    fmt.Printf("Send OK topic:%s key:%s value:%s\n", topic, key, content)
+	fmt.Printf("Send OK topic:%s key:%s value:%s\n", topic, key, content)
 
 	return nil
 }
 
 func main() {
-    //the key of the kafka messages 
-    //do not set the same the key for all messages, it may cause partition im-balance 
-    key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
-    value := "this is a kafka message!"
+	//the key of the kafka messages
+	//do not set the same the key for all messages, it may cause partition im-balance
+	key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
+	value := "this is a kafka message!"
 	produce(cfg.Topics[0], key, value)
 }

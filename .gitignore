@@ -2,3 +2,4 @@ bin
 pkg
 .idea
 src/github.com
+src/gopkg.in

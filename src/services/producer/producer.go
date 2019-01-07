@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"services"
 
@@ -70,6 +72,8 @@ func main() {
 	gin.DisableConsoleColor()
 
 	r := gin.Default()
+	r.MaxMultipartMemory = 1 << 20 // 1 MiB
+
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status":  0,
@@ -82,6 +86,22 @@ func main() {
 
 		file, _ := c.FormFile("file")
 		log.Println(file.Filename)
+
+		f, err := file.Open()
+		if err != nil {
+			panic(err)
+		}
+		defer f.Close()
+
+		reader := bufio.NewReader(f)
+		for {
+			line, err := reader.ReadString('\n')
+
+			if err != nil || io.EOF == err {
+				break
+			}
+			fmt.Println(line)
+		}
 
 		c.JSON(200, gin.H{
 			"status":  0,

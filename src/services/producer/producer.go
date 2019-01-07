@@ -68,12 +68,6 @@ func produce(topic string, key string, content string) error {
 }
 
 func main() {
-	//the key of the kafka messages
-	//do not set the same the key for all messages, it may cause partition im-balance
-	//key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
-	//value := "this is a kafka message!"
-	//produce(cfg.Topics[0], key, value)
-
 	gin.DisableConsoleColor()
 
 	r := gin.Default()

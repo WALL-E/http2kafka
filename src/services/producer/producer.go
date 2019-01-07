@@ -8,6 +8,9 @@ import (
 	"log"
 	"net/http"
 	"services"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/Shopify/sarama"
 	"github.com/gin-gonic/gin"
@@ -122,7 +125,27 @@ func main() {
 			if err != nil || io.EOF == err {
 				break
 			}
-			fmt.Println(line)
+			//fmt.Println(line)
+
+			line = strings.Replace(line, " ", "", -1)
+			line = strings.Replace(line, "\n", "", -1)
+
+			if len(line) == 0 {
+				continue
+			}
+
+			key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
+			value := line
+			err = produce(cfg.Topics[0], key, value)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"status":  StatusWriteKafkaFail,
+					"message": StatusText(StatusWriteKafkaFail),
+					"info":    fmt.Sprintf("line: %v", line),
+				})
+
+				return
+			}
 		}
 
 		c.JSON(http.StatusOK, gin.H{

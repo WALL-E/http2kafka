@@ -2,9 +2,11 @@ package main
 
 import (
 	"bufio"
+	"compress/gzip"
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"services"
 
 	"github.com/Shopify/sarama"
@@ -89,13 +91,33 @@ func main() {
 
 		f, err := file.Open()
 		if err != nil {
-			panic(err)
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  StatusReadFail,
+				"message": StatusText(StatusReadFail),
+				"info":    fmt.Sprintf("filename: %v", file.Filename),
+			})
+
+			return
 		}
 		defer f.Close()
 
-		reader := bufio.NewReader(f)
+		// 创建gzip文件读取对象
+		gr, err := gzip.NewReader(f)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  StatusGzipReadFail,
+				"message": StatusText(StatusGzipReadFail),
+				"info":    fmt.Sprintf("filename: %v", file.Filename),
+			})
+
+			return
+		}
+		defer gr.Close()
+
+		// 按行读取解压缩后的文件
+		rd := bufio.NewReader(gr)
 		for {
-			line, err := reader.ReadString('\n')
+			line, err := rd.ReadString('\n')
 
 			if err != nil || io.EOF == err {
 				break
@@ -103,7 +125,7 @@ func main() {
 			fmt.Println(line)
 		}
 
-		c.JSON(200, gin.H{
+		c.JSON(http.StatusOK, gin.H{
 			"status":  0,
 			"message": "ok",
 			"info":    fmt.Sprintf("topic: %v", topic),

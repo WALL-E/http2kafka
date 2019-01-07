@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"services"
-	"strconv"
-	"time"
 
 	"github.com/Shopify/sarama"
+	"github.com/gin-gonic/gin"
 )
 
 var cfg *configs.MqConfig
@@ -63,7 +63,32 @@ func produce(topic string, key string, content string) error {
 func main() {
 	//the key of the kafka messages
 	//do not set the same the key for all messages, it may cause partition im-balance
-	key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
-	value := "this is a kafka message!"
-	produce(cfg.Topics[0], key, value)
+	//key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
+	//value := "this is a kafka message!"
+	//produce(cfg.Topics[0], key, value)
+
+	gin.DisableConsoleColor()
+
+	r := gin.Default()
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":  0,
+			"message": "ok",
+		})
+	})
+
+	r.POST("/kafka/:topic/upload", func(c *gin.Context) {
+		topic := c.Param("topic")
+
+		file, _ := c.FormFile("file")
+		log.Println(file.Filename)
+
+		c.JSON(200, gin.H{
+			"status":  0,
+			"message": "ok",
+			"info":    fmt.Sprintf("topic: %v", topic),
+		})
+	})
+
+	r.Run(":8080") // listen and serve on 0.0.0.0:8080
 }

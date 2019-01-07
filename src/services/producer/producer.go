@@ -80,7 +80,7 @@ func main() {
 		})
 	})
 
-	r.POST("/kafka/:topic/upload", func(c *gin.Context) {
+	r.POST("/http2kafka/v1/:topic/upload", func(c *gin.Context) {
 		topic := c.Param("topic")
 
 		file, _ := c.FormFile("file")

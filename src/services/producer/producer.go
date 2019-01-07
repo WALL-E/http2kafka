@@ -18,6 +18,7 @@ import (
 
 var cfg *configs.MqConfig
 var producer sarama.SyncProducer
+var nonce int64
 
 func init() {
 
@@ -128,7 +129,12 @@ func main() {
 				continue
 			}
 
-			key := strconv.FormatInt(time.Now().UTC().UnixNano(), 10)
+			if nonce == 0 {
+				nonce = time.Now().UTC().UnixNano()
+			}
+			nonce++
+
+			key := strconv.FormatInt(nonce, 10)
 			value := line
 			err = produce(cfg.Topics[0], key, value)
 			if err != nil {

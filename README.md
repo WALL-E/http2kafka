@@ -5,8 +5,8 @@
 
 ## 安装环境
 1. 请确保安装了 Go 环境，详情请前往 [golang 官网](https://golang.org "golang 官网") 参考；
-2. 执行命令：`git clone https://github.com/AliwareMQ/aliware-kafka-demos.git`
-3. 执行命令：`cd aliware-kafka-demos/kafka-go-demo`
+2. 执行命令：`git clone https://github.com/WALL-E/http2kafka`
+3. 执行命令：`cd http2kafka`
 4. 执行命令：<code>export GOPATH=\`pwd\`</code>
 5. 执行命令安装依赖(请保证联网，需要几分钟，请耐心等待): 
 </br>`go get github.com/Shopify/sarama/ ; go get github.com/bsm/sarama-cluster`

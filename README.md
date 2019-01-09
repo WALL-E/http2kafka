@@ -5,17 +5,56 @@
 
 ## 安装环境
 1. 请确保安装了 Go 环境，详情请前往 [golang 官网](https://golang.org "golang 官网") 参考；
-2. 执行命令：`git clone https://github.com/WALL-E/http2kafka`
-3. 执行命令：`cd http2kafka`
-4. 执行命令：<code>export GOPATH=\`pwd\`</code>
+2. 执行命令：
+
+   ```
+   git clone https://github.com/WALL-E/http2kafka
+   ```
+3. 执行命令：
+
+    ```
+    cd http2kafka
+    ```
+
+4. 执行命令：
+
+   ```
+   export GOPATH=`pwd`
+   ```
 5. 执行命令安装依赖(请保证联网，需要几分钟，请耐心等待): 
-</br>`go get github.com/Shopify/sarama/ ; go get github.com/bsm/sarama-cluster`
-6. 执行命令：`go install services`
-7. 执行命令：`go install services/producer`
-8. 执行命令：`go install services/consumer`
+
+   ```
+   go get github.com/Shopify/sarama/ ; go get github.com/bsm/sarama-cluster
+   ```
+
+6. 执行命令：
+
+   ```
+    go install services
+   ```
+
+7. 执行命令：
+
+    ```
+    go install services/producer
+    ```
+
+8. 执行命令：
+    ```
+    go install services/consumer
+    ```
+
 9. 按照本页下面配置说明配置 conf/kafka.json
-10. 生产(没报错说明运行成功): `./bin/producer`
-11. 消费(没报错说明运行成功)：`./bin/consumer`
+10. 生产(没报错说明运行成功):
+    ```
+    ./bin/producer
+    ```
+
+11. 消费(没报错说明运行成功)：
+
+    ```
+    ./bin/consumer
+    ```
 
 
 ## 准备配置

@@ -109,21 +109,26 @@ func main() {
 		}
 		defer f.Close()
 
-		// 创建gzip文件读取对象
-		gr, err := gzip.NewReader(f)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status":  StatusGzipReadFail,
-				"message": StatusText(StatusGzipReadFail),
-				"info":    fmt.Sprintf("filename: %v", file.Filename),
-			})
+		rd := bufio.NewReader(f)
+		if strings.HasSuffix(file.Filename, ".gz") {
+			// 创建gzip文件读取对象
+			gr, err := gzip.NewReader(f)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"status":  StatusGzipReadFail,
+					"message": StatusText(StatusGzipReadFail),
+					"info":    fmt.Sprintf("filename: %v", file.Filename),
+				})
 
-			return
+				return
+			}
+			rd = bufio.NewReader(gr)
+
+			defer gr.Close()
 		}
-		defer gr.Close()
 
 		// 按行读取解压缩后的文件
-		rd := bufio.NewReader(gr)
+
 		for {
 			line, err := rd.ReadString('\n')
 

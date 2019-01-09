@@ -81,10 +81,21 @@ func main() {
 		})
 	})
 
+	// 只接受压缩文件，解压缩后的文件采用行格式
+	// 详细：http://jira.gmugmu.com:8090/pages/viewpage.action?pageId=3047483
 	r.POST("/http2kafka/v1/:topic/upload", func(c *gin.Context) {
 		topic := c.Param("topic")
 
-		file, _ := c.FormFile("file")
+		file, err := c.FormFile("file")
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  StatusReadFail,
+				"message": StatusText(StatusReadFail),
+				"info":    fmt.Sprintf("file: %v", file),
+			})
+
+			return
+		}
 		log.Println(file.Filename)
 
 		f, err := file.Open()
@@ -146,6 +157,37 @@ func main() {
 
 				return
 			}
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":  0,
+			"message": "ok",
+			"info":    fmt.Sprintf("topic: %v", topic),
+		})
+	})
+
+	// 只接收文本数据
+	r.POST("/http2kafka/v1/:topic/send", func(c *gin.Context) {
+		topic := c.Param("topic")
+
+		data, err := c.GetRawData()
+
+		if nonce == 0 {
+			nonce = time.Now().UTC().UnixNano()
+		}
+		nonce++
+
+		key := strconv.FormatInt(nonce, 10)
+		value := string(data[:])
+		err = produce(cfg.Topics[0], key, value)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  StatusWriteKafkaFail,
+				"message": StatusText(StatusWriteKafkaFail),
+				"info":    fmt.Sprintf("data: %v", data),
+			})
+
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{

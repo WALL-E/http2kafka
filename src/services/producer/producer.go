@@ -82,7 +82,7 @@ func main() {
 
 	// 只接受压缩文件，解压缩后的文件采用行格式
 	// 详细：http://jira.gmugmu.com:8090/pages/viewpage.action?pageId=3047483
-	r.POST("/http2kafka/v1/:topic/upload", func(c *gin.Context) {
+	r.POST("/:topic/upload", func(c *gin.Context) {
 		topic := c.Param("topic")
 
 		file, err := c.FormFile("file")
@@ -171,7 +171,7 @@ func main() {
 	})
 
 	// 只接收文本数据
-	r.POST("/http2kafka/v1/:topic/send", func(c *gin.Context) {
+	r.POST("/:topic/send", func(c *gin.Context) {
 		topic := c.Param("topic")
 
 		data, err := c.GetRawData()

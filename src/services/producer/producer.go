@@ -147,7 +147,7 @@ func main() {
 
 			key := strconv.FormatInt(nonce, 10)
 			value := line
-			err = produce(cfg.Topics[0], key, value)
+			err = produce(topic, key, value)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
 					"status":  StatusWriteKafkaFail,
@@ -179,7 +179,7 @@ func main() {
 
 		key := strconv.FormatInt(nonce, 10)
 		value := string(data[:])
-		err = produce(cfg.Topics[0], key, value)
+		err = produce(topic, key, value)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"status":  StatusWriteKafkaFail,

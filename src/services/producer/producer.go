@@ -195,8 +195,8 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
-			"message": "ok",
+			"status":  StatusOK,
+			"message": StatusText(StatusOK),
 			"info":    fmt.Sprintf("topic: %v", topic),
 		})
 	})

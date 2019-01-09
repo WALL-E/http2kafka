@@ -1,6 +1,8 @@
 package main
 
 const (
+	StatusOK = 0
+
 	// 客户端引起的错误
 	StatusReadFail     = 401001
 	StatusGzipReadFail = 401002
@@ -10,6 +12,8 @@ const (
 )
 
 var statusText = map[int]string{
+	StatusOK: "Ok",
+
 	StatusReadFail:     "Read Fail",
 	StatusGzipReadFail: "Gzip Read Fail",
 

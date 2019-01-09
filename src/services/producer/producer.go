@@ -5,7 +5,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"services"
 	"strconv"
@@ -63,7 +62,7 @@ func produce(topic string, key string, content string) error {
 		fmt.Println(msg)
 		return err
 	}
-	fmt.Printf("Send OK topic:%s key:%s value:%s\n", topic, key, content)
+	// fmt.Printf("Send OK topic:%s key:%s value:%s\n", topic, key, content)
 
 	return nil
 }
@@ -96,7 +95,7 @@ func main() {
 
 			return
 		}
-		log.Println(file.Filename)
+		// log.Println(file.Filename)
 
 		f, err := file.Open()
 		if err != nil {

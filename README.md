@@ -65,3 +65,7 @@
 | conf/kafka.json | servers | 请修改为控制台获取的接入点 |
 | conf/kafka.json  | consumerGroup | 请修改为控制要申请的 Consumer Group |
 
+## TODO
+
+1. 增加命令行参数，可以指定配置文件
+2. 重构代码

@@ -7,7 +7,7 @@ PWD=$(cd "$(dirname "$0")"; pwd)
 
 cd $PWD
 
-curl -XPOST http://127.0.0.1:8080/http2kafka/v1/topic1/upload -H "Content-Type: multipart/form-data" -F "file=@qos.sol"
+curl -XPOST http://127.0.0.1:8080/http2kafka/v1/http2mq/upload -H "Content-Type: multipart/form-data" -F "file=@qos.sol"
 echo ""
 
 curl -XPOST http://127.0.0.1:8080/http2kafka/v1/http2mq/upload -H "Content-Type: multipart/form-data" -F "file=@qos.sol.gz"

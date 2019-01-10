@@ -80,7 +80,7 @@ func main() {
 		})
 	})
 
-	// 只接受压缩文件，解压缩后的文件采用行格式
+	// 接收上传单个文件
 	// 详细：http://jira.gmugmu.com:8090/pages/viewpage.action?pageId=3047483
 	r.POST("/:topic/upload", func(c *gin.Context) {
 		topic := c.Param("topic")
@@ -160,6 +160,90 @@ func main() {
 				})
 
 				return
+			}
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":  0,
+			"message": "ok",
+			"info":    fmt.Sprintf("topic: %v", topic),
+		})
+	})
+
+	// 接收上传多个文件
+	// 详细：http://jira.gmugmu.com:8090/pages/viewpage.action?pageId=3047483
+	r.POST("/:topic/multiple", func(c *gin.Context) {
+		topic := c.Param("topic")
+		form, _ := c.MultipartForm()
+		files := form.File["file[]"]
+
+		for _, file := range files {
+			// log.Println(file.Filename)
+
+			f, err := file.Open()
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"status":  StatusReadFail,
+					"message": StatusText(StatusReadFail),
+					"info":    fmt.Sprintf("filename: %v", file.Filename),
+				})
+
+				return
+			}
+			defer f.Close()
+
+			rd := bufio.NewReader(f)
+			if strings.HasSuffix(file.Filename, ".gz") {
+				// 创建gzip文件读取对象
+				gr, err := gzip.NewReader(f)
+				if err != nil {
+					c.JSON(http.StatusBadRequest, gin.H{
+						"status":  StatusGzipReadFail,
+						"message": StatusText(StatusGzipReadFail),
+						"info":    fmt.Sprintf("filename: %v", file.Filename),
+					})
+
+					return
+				}
+				rd = bufio.NewReader(gr)
+
+				defer gr.Close()
+			}
+
+			// 按行读取解压缩后的文件
+
+			for {
+				line, err := rd.ReadString('\n')
+
+				if err != nil || io.EOF == err {
+					break
+				}
+				//fmt.Println(line)
+
+				line = strings.Replace(line, " ", "", -1)
+				line = strings.Replace(line, "\n", "", -1)
+
+				if len(line) == 0 {
+					continue
+				}
+
+				if nonce == 0 {
+					nonce = time.Now().UTC().UnixNano()
+				}
+				nonce++
+
+				key := strconv.FormatInt(nonce, 10)
+				value := line
+				err = produce(topic, key, value)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{
+						"status":  StatusWriteKafkaFail,
+						"message": StatusText(StatusWriteKafkaFail),
+						"info":    fmt.Sprintf("line: %v", line),
+					})
+
+					return
+				}
 			}
 		}
 

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"compress/gzip"
 	"fmt"
-	"io"
 	"net/http"
 	"services"
 	"strconv"
@@ -102,7 +101,7 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status":  StatusReadFail,
 				"message": StatusText(StatusReadFail),
-				"info":    fmt.Sprintf("filename: %v", file.Filename),
+				"info":    fmt.Sprintf("[1]filename: %v", file.Filename),
 			})
 
 			return
@@ -117,7 +116,7 @@ func main() {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"status":  StatusGzipReadFail,
 					"message": StatusText(StatusGzipReadFail),
-					"info":    fmt.Sprintf("filename: %v", file.Filename),
+					"info":    fmt.Sprintf("[2]filename: %v", file.Filename),
 				})
 
 				return
@@ -127,40 +126,35 @@ func main() {
 			defer gr.Close()
 		}
 
-		// 按行读取解压缩后的文件
+		fileSize := rd.Size()
+		buffer := make([]byte, fileSize)
+		_, err = rd.Read(buffer)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"status":  StatusReadFail,
+				"message": StatusText(StatusReadFail),
+				"info":    fmt.Sprintf("[3]filename: %v", file.Filename),
+			})
 
-		for {
-			line, err := rd.ReadString('\n')
+			return
+		}
 
-			if err != nil || io.EOF == err {
-				break
-			}
-			//fmt.Println(line)
+		if nonce == 0 {
+			nonce = time.Now().UTC().UnixNano()
+		}
+		nonce++
 
-			line = strings.Replace(line, " ", "", -1)
-			line = strings.Replace(line, "\n", "", -1)
+		key := strconv.FormatInt(nonce, 10)
+		value := string(buffer)
+		err = produce(topic, key, value)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status":  StatusWriteKafkaFail,
+				"message": StatusText(StatusWriteKafkaFail),
+				"info":    fmt.Sprintf("[4]filename: %v", file.Filename),
+			})
 
-			if len(line) == 0 {
-				continue
-			}
-
-			if nonce == 0 {
-				nonce = time.Now().UTC().UnixNano()
-			}
-			nonce++
-
-			key := strconv.FormatInt(nonce, 10)
-			value := line
-			err = produce(topic, key, value)
-			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{
-					"status":  StatusWriteKafkaFail,
-					"message": StatusText(StatusWriteKafkaFail),
-					"info":    fmt.Sprintf("line: %v", line),
-				})
-
-				return
-			}
+			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -185,7 +179,7 @@ func main() {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"status":  StatusReadFail,
 					"message": StatusText(StatusReadFail),
-					"info":    fmt.Sprintf("filename: %v", file.Filename),
+					"info":    fmt.Sprintf("[1]filename: %v", file.Filename),
 				})
 
 				return
@@ -200,7 +194,7 @@ func main() {
 					c.JSON(http.StatusBadRequest, gin.H{
 						"status":  StatusGzipReadFail,
 						"message": StatusText(StatusGzipReadFail),
-						"info":    fmt.Sprintf("filename: %v", file.Filename),
+						"info":    fmt.Sprintf("[2]filename: %v", file.Filename),
 					})
 
 					return
@@ -210,40 +204,35 @@ func main() {
 				defer gr.Close()
 			}
 
-			// 按行读取解压缩后的文件
+			fileSize := rd.Size()
+			buffer := make([]byte, fileSize)
+			_, err = rd.Read(buffer)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, gin.H{
+					"status":  StatusReadFail,
+					"message": StatusText(StatusReadFail),
+					"info":    fmt.Sprintf("[3]filename: %v", file.Filename),
+				})
 
-			for {
-				line, err := rd.ReadString('\n')
+				return
+			}
 
-				if err != nil || io.EOF == err {
-					break
-				}
-				//fmt.Println(line)
+			if nonce == 0 {
+				nonce = time.Now().UTC().UnixNano()
+			}
+			nonce++
 
-				line = strings.Replace(line, " ", "", -1)
-				line = strings.Replace(line, "\n", "", -1)
+			key := strconv.FormatInt(nonce, 10)
+			value := string(buffer)
+			err = produce(topic, key, value)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"status":  StatusWriteKafkaFail,
+					"message": StatusText(StatusWriteKafkaFail),
+					"info":    fmt.Sprintf("[4]filename: %v", file.Filename),
+				})
 
-				if len(line) == 0 {
-					continue
-				}
-
-				if nonce == 0 {
-					nonce = time.Now().UTC().UnixNano()
-				}
-				nonce++
-
-				key := strconv.FormatInt(nonce, 10)
-				value := line
-				err = produce(topic, key, value)
-				if err != nil {
-					c.JSON(http.StatusInternalServerError, gin.H{
-						"status":  StatusWriteKafkaFail,
-						"message": StatusText(StatusWriteKafkaFail),
-						"info":    fmt.Sprintf("line: %v", line),
-					})
-
-					return
-				}
+				return
 			}
 		}
 

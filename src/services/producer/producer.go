@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"compress/gzip"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"services"
 	"strconv"
@@ -126,9 +127,7 @@ func main() {
 			defer gr.Close()
 		}
 
-		fileSize := rd.Size()
-		buffer := make([]byte, fileSize)
-		_, err = rd.Read(buffer)
+		buffer, err := ioutil.ReadAll(rd)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"status":  StatusReadFail,
@@ -204,9 +203,7 @@ func main() {
 				defer gr.Close()
 			}
 
-			fileSize := rd.Size()
-			buffer := make([]byte, fileSize)
-			_, err = rd.Read(buffer)
+			buffer, err := ioutil.ReadAll(rd)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
 					"status":  StatusReadFail,

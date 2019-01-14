@@ -159,7 +159,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,
 			"message": "ok",
-			"info":    fmt.Sprintf("topic: %v", topic),
+			"info":    fmt.Sprintf("topic: %v, size: %v", topic, len(buffer)),
 		})
 	})
 
@@ -170,6 +170,7 @@ func main() {
 		form, _ := c.MultipartForm()
 		files := form.File["file[]"]
 
+		totalSize := 0
 		for _, file := range files {
 			// log.Println(file.Filename)
 
@@ -231,12 +232,14 @@ func main() {
 
 				return
 			}
+
+			totalSize = totalSize + len(buffer)
 		}
 
 		c.JSON(http.StatusOK, gin.H{
 			"status":  0,
 			"message": "ok",
-			"info":    fmt.Sprintf("topic: %v", topic),
+			"info":    fmt.Sprintf("topic: %v, size: %v", topic, totalSize),
 		})
 	})
 

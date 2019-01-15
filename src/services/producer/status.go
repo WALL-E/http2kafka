@@ -1,7 +1,7 @@
 package main
 
 const (
-	StatusOK = 0
+	StatusOK = 200
 
 	// 客户端引起的错误
 	StatusReadFail     = 401001

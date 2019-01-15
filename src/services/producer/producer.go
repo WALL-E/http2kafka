@@ -75,8 +75,8 @@ func main() {
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"status":  0,
-			"message": "ok",
+			"status":  StatusOK,
+			"message": StatusText(StatusOK),
 		})
 	})
 
@@ -157,8 +157,8 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
-			"message": "ok",
+			"status":  StatusOK,
+			"message": StatusText(StatusOK),
 			"info":    fmt.Sprintf("topic: %v, size: %v", topic, len(buffer)),
 		})
 	})
@@ -237,8 +237,8 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status":  0,
-			"message": "ok",
+			"status":  StatusOK,
+			"message": StatusText(StatusOK),
 			"info":    fmt.Sprintf("topic: %v, size: %v", topic, totalSize),
 		})
 	})

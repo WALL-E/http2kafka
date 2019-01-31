@@ -88,9 +88,11 @@ func main() {
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"status":  StatusOK,
-			"message": StatusText(StatusOK),
-			"info":    fmt.Sprintf("service by %v/%v", project, version),
+			"meta": gin.H{
+				"status":  StatusOK,
+				"message": StatusText(StatusOK),
+				"info":    fmt.Sprintf("service by %v/%v", project, version),
+			},
 		})
 	})
 
@@ -102,9 +104,11 @@ func main() {
 		file, err := c.FormFile("file")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"status":  StatusReadFail,
-				"message": StatusText(StatusReadFail),
-				"info":    fmt.Sprintf("file: %v", file),
+				"meta": gin.H{
+					"status":  StatusReadFail,
+					"message": StatusText(StatusReadFail),
+					"info":    fmt.Sprintf("file: %v", file),
+				},
 			})
 
 			return
@@ -114,9 +118,11 @@ func main() {
 		f, err := file.Open()
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"status":  StatusReadFail,
-				"message": StatusText(StatusReadFail),
-				"info":    fmt.Sprintf("[1]filename: %v", file.Filename),
+				"meta": gin.H{
+					"status":  StatusReadFail,
+					"message": StatusText(StatusReadFail),
+					"info":    fmt.Sprintf("[1]filename: %v", file.Filename),
+				},
 			})
 
 			return
@@ -129,9 +135,11 @@ func main() {
 			gr, err := gzip.NewReader(f)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"status":  StatusGzipReadFail,
-					"message": StatusText(StatusGzipReadFail),
-					"info":    fmt.Sprintf("[2]filename: %v", file.Filename),
+					"meta": gin.H{
+						"status":  StatusGzipReadFail,
+						"message": StatusText(StatusGzipReadFail),
+						"info":    fmt.Sprintf("[2]filename: %v", file.Filename),
+					},
 				})
 
 				return
@@ -144,9 +152,11 @@ func main() {
 		buffer, err := ioutil.ReadAll(rd)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"status":  StatusReadFail,
-				"message": StatusText(StatusReadFail),
-				"info":    fmt.Sprintf("[3]filename: %v", file.Filename),
+				"meta": gin.H{
+					"status":  StatusReadFail,
+					"message": StatusText(StatusReadFail),
+					"info":    fmt.Sprintf("[3]filename: %v", file.Filename),
+				},
 			})
 
 			return
@@ -162,18 +172,22 @@ func main() {
 		err = produce(topic, key, value)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"status":  StatusWriteKafkaFail,
-				"message": StatusText(StatusWriteKafkaFail),
-				"info":    fmt.Sprintf("[4]filename: %v", file.Filename),
+				"meta": gin.H{
+					"status":  StatusWriteKafkaFail,
+					"message": StatusText(StatusWriteKafkaFail),
+					"info":    fmt.Sprintf("[4]filename: %v", file.Filename),
+				},
 			})
 
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status":  StatusOK,
-			"message": StatusText(StatusOK),
-			"info":    fmt.Sprintf("topic: %v, size: %v", topic, len(buffer)),
+			"meta": gin.H{
+				"status":  StatusOK,
+				"message": StatusText(StatusOK),
+				"info":    fmt.Sprintf("topic: %v, size: %v", topic, len(buffer)),
+			},
 		})
 	})
 
@@ -191,9 +205,11 @@ func main() {
 			f, err := file.Open()
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"status":  StatusReadFail,
-					"message": StatusText(StatusReadFail),
-					"info":    fmt.Sprintf("[1]filename: %v", file.Filename),
+					"meta": gin.H{
+						"status":  StatusReadFail,
+						"message": StatusText(StatusReadFail),
+						"info":    fmt.Sprintf("[1]filename: %v", file.Filename),
+					},
 				})
 
 				return
@@ -206,9 +222,11 @@ func main() {
 				gr, err := gzip.NewReader(f)
 				if err != nil {
 					c.JSON(http.StatusBadRequest, gin.H{
-						"status":  StatusGzipReadFail,
-						"message": StatusText(StatusGzipReadFail),
-						"info":    fmt.Sprintf("[2]filename: %v", file.Filename),
+						"meta": gin.H{
+							"status":  StatusGzipReadFail,
+							"message": StatusText(StatusGzipReadFail),
+							"info":    fmt.Sprintf("[2]filename: %v", file.Filename),
+						},
 					})
 
 					return
@@ -221,9 +239,11 @@ func main() {
 			buffer, err := ioutil.ReadAll(rd)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{
-					"status":  StatusReadFail,
-					"message": StatusText(StatusReadFail),
-					"info":    fmt.Sprintf("[3]filename: %v", file.Filename),
+					"meta": gin.H{
+						"status":  StatusReadFail,
+						"message": StatusText(StatusReadFail),
+						"info":    fmt.Sprintf("[3]filename: %v", file.Filename),
+					},
 				})
 
 				return
@@ -239,9 +259,11 @@ func main() {
 			err = produce(topic, key, value)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{
-					"status":  StatusWriteKafkaFail,
-					"message": StatusText(StatusWriteKafkaFail),
-					"info":    fmt.Sprintf("[4]filename: %v", file.Filename),
+					"meta": gin.H{
+						"status":  StatusWriteKafkaFail,
+						"message": StatusText(StatusWriteKafkaFail),
+						"info":    fmt.Sprintf("[4]filename: %v", file.Filename),
+					},
 				})
 
 				return
@@ -251,9 +273,11 @@ func main() {
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status":  StatusOK,
-			"message": StatusText(StatusOK),
-			"info":    fmt.Sprintf("topic: %v, size: %v", topic, totalSize),
+			"meta": gin.H{
+				"status":  StatusOK,
+				"message": StatusText(StatusOK),
+				"info":    fmt.Sprintf("topic: %v, size: %v", topic, totalSize),
+			},
 		})
 	})
 
@@ -273,18 +297,22 @@ func main() {
 		err = produce(topic, key, value)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"status":  StatusWriteKafkaFail,
-				"message": StatusText(StatusWriteKafkaFail),
-				"info":    fmt.Sprintf("data: %v", data),
+				"meta": gin.H{
+					"status":  StatusWriteKafkaFail,
+					"message": StatusText(StatusWriteKafkaFail),
+					"info":    fmt.Sprintf("data: %v", data),
+				},
 			})
 
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"status":  StatusOK,
-			"message": StatusText(StatusOK),
-			"info":    fmt.Sprintf("topic: %v", topic),
+			"meta": gin.H{
+				"status":  StatusOK,
+				"message": StatusText(StatusOK),
+				"info":    fmt.Sprintf("topic: %v", topic),
+			},
 		})
 	})
 

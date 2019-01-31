@@ -13,11 +13,15 @@ import (
 
 	"github.com/Shopify/sarama"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var cfg *configs.MqConfig
 var producer sarama.SyncProducer
 var nonce int64
+
+var project = "http2kafka"
+var version = "0.0.2"
 
 func init() {
 
@@ -67,7 +71,16 @@ func produce(topic string, key string, content string) error {
 	return nil
 }
 
+func exportMetrics() {
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":11901", nil)
+	}()
+}
+
 func main() {
+	exportMetrics()
+
 	gin.DisableConsoleColor()
 
 	r := gin.Default()
@@ -77,6 +90,7 @@ func main() {
 		c.JSON(200, gin.H{
 			"status":  StatusOK,
 			"message": StatusText(StatusOK),
+			"info":    fmt.Sprintf("service by %v/%v", project, version),
 		})
 	})
 
@@ -274,5 +288,5 @@ func main() {
 		})
 	})
 
-	r.Run(":8080") // listen and serve on 0.0.0.0:8080
+	r.Run(":10901") // listen and serve on 0.0.0.0:8080
 }
